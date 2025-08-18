@@ -1,16 +1,8 @@
 <form action="action_page.php">
   <div class="container">
-<<<<<<< HEAD:index/src/main/webapp/index.jsp
-    <h1>Welcome!! Saidemy DevOps Student Registration Form for KIYANSH !!</h1>
-=======
-    <h1>Welcome!! Saidemy DevOps Student Registration Form for Mangesh Takras !!</h1>
->>>>>>> parent of 5353f2b (update):webapp/src/main/webapp/index.jsp
+    <h1>Welcome!! Saidemy DevOps Student Registration Form for anyone!!</h1>
     <p>Please fill in this form!</p>
     <hr>
-    <br>
-
-    <label for="name"><b>Name</b></label>
-    <input type="text" placeholder="Enter Name" name="Name" id="name" required>
     <br>
 
     <label for="email"><b>Email</b></label>
