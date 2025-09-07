@@ -1,0 +1,53 @@
+---
+- name: Build and push regapp image with WAR
+  hosts: ansible
+  vars:
+    dockerhub_user: "mangesh2107"
+    dockerhub_pass: "Mangesh@2107"
+    app_version: "v{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"   # unique version each build
+
+  tasks:
+
+    - name: Build Docker image with WAR
+      community.docker.docker_image:
+        name: "regapp"   # build directly with full repo name
+        tag: "{{ app_version }}"
+        build:
+          path: /opt/docker
+          nocache: true
+        source: build
+
+    - name: Get latest regapp tag
+      shell: docker images --format "{{'{{'}}.Tag{{'}}'}}" regapp | head -n 1
+      register: latest_tag
+
+    - name: Save latest tag as a variable
+      set_fact:
+        msg: "{{ latest_tag.stdout }}"
+
+    - debug:
+        msg: "Latest image tag is: {{ msg }}"
+
+
+
+    - name: Docker login
+      community.docker.docker_login:
+        username: "{{ dockerhub_user }}"
+        password: "{{ dockerhub_pass }}"
+        registry_url: https://index.docker.io/v1/
+
+    - name: Tag image for DockerHub
+      community.docker.docker_image:
+        name: regapp
+        tag: "{{ msg }}"
+        repository: "{{ dockerhub_user }}/regapp"
+        source: local
+        push: false
+
+    - name: Push image to DockerHub
+      community.docker.docker_image:
+        name: "{{ dockerhub_user }}/regapp"
+        tag: "{{ msg }}"
+        push: true
+        source: local
+

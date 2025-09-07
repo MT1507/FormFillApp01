@@ -1,0 +1,48 @@
+
+---
+- name: Deploy latest regapp from DockerHub
+  hosts: docker
+  tasks:
+
+    - name: Fetch latest tag from DockerHub
+      uri:
+        url: "https://hub.docker.com/v2/repositories/mangesh2107/regapp/tags?page_size=1"
+        method: GET
+        return_content: yes
+      register: hub_tags
+
+    - name: Save latest tag as variable
+      set_fact:
+        latest_tag: "{{ hub_tags.json.results[0].name }}"
+
+    - debug:
+        msg: "Latest regapp tag from DockerHub is: {{ latest_tag }}"
+
+    - name: Remove old regapp image (if exists)
+      community.docker.docker_image:
+        name: "mangesh2107/regapp"
+        tag: "{{ latest_tag }}"
+        state: absent
+        force_absent: true
+
+    - name: Pull fresh regapp image from DockerHub
+      community.docker.docker_image:
+        name: "mangesh2107/regapp"
+        tag: "{{ latest_tag }}"
+        source: pull
+        force_source: true
+
+    - name: Stop and remove existing regapp container
+      community.docker.docker_container:
+        name: regapp-container
+        state: absent
+
+    - name: Run new regapp container
+      community.docker.docker_container:
+        name: regapp-container
+        image: "mangesh2107/regapp:{{ latest_tag }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "8081:8080"
+
