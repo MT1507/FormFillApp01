@@ -1,0 +1,27 @@
+---
+
+- name: Deploy regapp to Kubernetes
+  hosts: ansible
+  vars:
+    dockerhub_user: "mangesh2107"
+    dockerhub_pass: "Mangesh@2107"
+    image_name: "regapp" 
+  
+  tasks:
+    # ... your Docker build, tag, push tasks ...
+
+    - name: Get latest tag from DockerHub
+      uri:
+        url: "https://registry.hub.docker.com/v2/repositories/{{ dockerhub_user }}/{{ image_name }}/tags?page_size=1"
+        return_content: yes
+      register: dockerhub_response
+
+    - name: Set latest tag as fact
+      set_fact:
+        app_version: "{{ dockerhub_response.json.results[0].name }}"    
+
+    - name: Render Kubernetes deployment manifest
+      template:
+        src: regapp-deploy.yml.j2
+        dest: /opt/docker/regapp-deploy.yml
+      ignore_errors: yes  

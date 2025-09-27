@@ -6,6 +6,7 @@
     dockerhub_pass: "Mangesh@2107"
     app_version: "v{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"   # unique version each build
 
+    
   tasks:
 
     - name: Build Docker image with WAR

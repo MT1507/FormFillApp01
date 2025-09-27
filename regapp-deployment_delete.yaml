@@ -1,0 +1,21 @@
+---
+- name: Deploy RegApp using kubectl
+  hosts: kubernates
+  gather_facts: false
+
+  vars:
+    kubeconfig_path: "/home/mangesh/.kube/config"
+    manifest_dir: "/opt/docker/"
+
+  tasks:
+
+
+    - name: Apply Deployment manifest
+      ansible.builtin.command:
+        cmd: kubectl delete -f {{ manifest_dir }}/regapp-deploy.yml --kubeconfig {{ kubeconfig_path }}
+      ignore_errors: yes 
+        
+    - name: Apply Service manifest
+      ansible.builtin.command:
+        cmd: kubectl delete -f {{ manifest_dir }}/regapp-service.yml --kubeconfig {{ kubeconfig_path }}
+      ignore_errors: yes

@@ -1,0 +1,52 @@
+---
+- name: Deploy RegApp using kubectl
+  hosts: kubernates
+  gather_facts: false
+
+  vars:
+    kubeconfig_path: "/home/mangesh/.kube/config"
+    manifest_dir: "/opt/docker/"
+
+  tasks:
+
+    - name: Create manifest directory on target
+      ansible.builtin.file:
+        path: "{{ manifest_dir }}"
+        state: directory
+      ignore_errors: yes
+
+    - name: Delete old deployment manifests from nodes
+      ansible.builtin.file:
+        path: "{{ manifest_dir }}/regapp-deploy.yml"
+        state: absent
+      ignore_errors: yes
+
+    - name: Delete old service manifests from nodes
+      ansible.builtin.file:
+        path: "{{ manifest_dir }}/regapp-service.yml"
+        state: absent
+      ignore_errors: yes
+
+    - name: Copy Deployment manifest
+      ansible.builtin.copy:
+        src: regapp-deploy.yml
+        dest: "{{ manifest_dir }}/regapp-deploy.yml"
+      ignore_errors: yes
+
+    - name: Copy Service manifest
+      ansible.builtin.copy:
+        src: regapp-service.yml
+        dest: "{{ manifest_dir }}/regapp-service.yml"
+      ignore_errors: yes
+
+    - name: Apply Deployment manifest
+      ansible.builtin.command:
+        cmd: kubectl apply -f {{ manifest_dir }}/regapp-deploy.yml --kubeconfig {{ kubeconfig_path }}
+      ignore_errors: yes
+
+    - name: Apply Service manifest
+      ansible.builtin.command:
+        cmd: kubectl apply -f {{ manifest_dir }}/regapp-service.yml --kubeconfig {{ kubeconfig_path }}
+      ignore_errors: yes
+
+

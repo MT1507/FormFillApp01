@@ -1,7 +1,6 @@
-
 ---
 - name: Deploy latest regapp from DockerHub
-  hosts: docker
+  hosts: kubernates
   tasks:
 
     - name: Fetch latest tag from DockerHub
